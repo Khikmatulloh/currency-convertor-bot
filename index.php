@@ -1,19 +1,24 @@
-
 <?php
 
 
+require 'dashboard.php';
 
 require 'vendor/autoload.php';
 
-$update = json_decode(file_get_contents('php://input'));
+$update = json_decode(file_get_contents('php://input'),true);
 
 if (isset($update)) {
     require 'bot.php';
     return;
 }
 
-require 'dashboard.php';
+$botHandler = new BotHandler();
 
+if (isset($update['message'])) {
+    $botHandler->handleMessage($update['message']);
+} elseif (isset($update['callback_query'])) {
+    $botHandler->handleCallbackQuery($update['callback_query']);
+}
 
 require 'db.php';
 
@@ -54,7 +59,6 @@ try {
     <p align=right>1 USD = 12632.88 UZS</p>
     <table>
         <tr>
-      
             <th>Chat ID</th>
             <th>Amount</th>
             <th>Status</th>
@@ -62,13 +66,12 @@ try {
         </tr>
         <?php foreach ($conversions as $conversion): ?>
             <tr>
-                <td><?php echo htmlspecialchars($conversion['chat_id']); ?></td>
-                <td><?php echo htmlspecialchars($conversion['amount']); ?></td>
-                <td><?php echo htmlspecialchars($conversion['status']); ?></td>
-                <td><?php echo htmlspecialchars($conversion['created_at']); ?></td>
+                <td><?php echo htmlspecialchars((string) $conversion['chat_id']); ?></td>
+                <td><?php echo htmlspecialchars((string) $conversion['amount']); ?></td>
+                <td><?php echo htmlspecialchars((string) $conversion['status']); ?></td>
+                <td><?php echo htmlspecialchars((string) $conversion['created_at']); ?></td>
             </tr>
         <?php endforeach; ?>
     </table>
 </body>
 </html>
-
